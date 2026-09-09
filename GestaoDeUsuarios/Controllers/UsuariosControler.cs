@@ -50,5 +50,30 @@ namespace GestaoDeUsuarios.Controllers
 
             return Ok(new { mensagem = "Usuário cadastrado com sucesso!" });
         }
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] Usuario usuario)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            var sql = "UPDATE usuarios SET Nome = @Nome, Email = @Email, Idade = @Idade WHERE Id = @Id";
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@Nome", usuario.Nome);
+            command.Parameters.AddWithValue("@Email", usuario.Email);
+            command.Parameters.AddWithValue("@Idade", usuario.Idade);
+            command.Parameters.AddWithValue("@Id", id);
+
+            var linhasAlteradas = command.ExecuteNonQuery();
+
+            if (linhasAlteradas == 0)
+            {
+                return NotFound(new { mensagem = "Usuário não encontrado." });
+
+            }
+
+            return Ok(new { mensagem = "Usuário atualizado com sucesso!" });
+        }
+
     }
 }
